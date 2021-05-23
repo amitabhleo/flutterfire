@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
           return AlertDialog(
             title: Text('Add Todo'),
             content: Form(
+              autovalidateMode: AutovalidateMode.always,
               key: formlKey,
               child: TextFormField(
                 decoration: InputDecoration(
@@ -50,7 +52,9 @@ class _HomePageState extends State<HomePage> {
             actions: <Widget>[
               TextButton(
                   onPressed: () {
-                    db.collection("tasks").add({'task': _task});
+                    db
+                        .collection("tasks")
+                        .add({'task': _task, 'time': DateTime.now()});
                     Navigator.pop(context);
                   },
                   child: Text(
@@ -66,16 +70,44 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: showdialog,
-        child: Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        title: Text('Tasks'),
-      ),
-      body: Center(
-        child: Text('Flutter'),
-      ),
-    ));
+            floatingActionButton: FloatingActionButton(
+              onPressed: showdialog,
+              child: Icon(Icons.add),
+            ),
+            appBar: AppBar(
+              title: Text('Tasks'),
+            ),
+            body: StreamBuilder<QuerySnapshot>(
+                stream: db.collection('tasks').orderBy('time').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    // return Text('has data');
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot ds = snapshot.data!.docs[index];
+                          return Container(
+                            child: ListTile(
+                              title: Text(ds['task']),
+                              onLongPress: () {
+                                //deletes
+                                db.collection('tasks').doc(ds.id).delete();
+                              },
+                              onTap: () {
+                                //update Data
+                                db
+                                    .collection('tasks')
+                                    .doc(ds.id)
+                                    .update({'task': "new value"});
+                              },
+                            ),
+                          );
+                        });
+                  } else if (snapshot.hasError) {
+                    return CircularProgressIndicator();
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                })));
   }
 }
