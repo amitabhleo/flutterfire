@@ -8,19 +8,38 @@ class SignIn extends StatelessWidget {
     return Material(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Sign in anonymous'),
+          title: Text('Sign in '),
         ),
-        body: TextButton(
-          onPressed: () {
-            _authSer.signInAnony();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(
-              'SignIn anonymous',
-              style: TextStyle(fontSize: 20.0),
+        body: Column(
+          children: [
+            TextButton(
+              onPressed: () {
+                _authSer.signInAnony();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  'SignIn anonymous',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              ),
             ),
-          ),
+            SizedBox(
+              height: 20.0,
+            ),
+            TextButton(
+              onPressed: () {
+                _authSer.signInPhone("+44 7444 555666");
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  'SignIn with +44 7444 555666',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
